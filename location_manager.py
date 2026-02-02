@@ -1,39 +1,50 @@
-import streamlit as st
-from streamlit_js_eval import get_geolocation
 import base64
 import requests
-import time
+
+def _encode(texto):
+    """Codifica texto a Base64."""
+    return base64.b64encode(texto.encode()).decode()
 
 def _obtener_nombre_pueblo(lat, lon):
-    """Traduce coordenadas a nombre de pueblo (como ayer en Malva)."""
+    """Intenta sacar el nombre del pueblo con las coordenadas."""
     try:
         url = f"https://nominatim.openstreetmap.org/reverse?lat={lat}&lon={lon}&format=json&zoom=14"
-        res = requests.get(url, headers={'User-Agent': 'tasador-agricola'}, timeout=3)
-        data = res.json()
-        addr = data.get('address', {})
-        return addr.get('village') or addr.get('town') or addr.get('city') or "Zamora"
+        # User-Agent es obligatorio para que no nos bloqueen
+        res = requests.get(url, headers={'User-Agent': 'tasador-app-v1'}, timeout=2)
+        if res.status_code == 200:
+            data = res.json()
+            addr = data.get('address', {})
+            return addr.get('village') or addr.get('town') or addr.get('city') or "Zona Rural"
     except:
-        return "Castilla y Leon"
+        pass
+    return None
 
-def obtener_ubicacion():
-    """Motor híbrido: GPS rápido o Red instantánea."""
-    # 1. Intento de GPS (espera activa de 3 segundos)
-    loc = get_geolocation(component_key="gps_malva_fix")
-    
-    if loc and isinstance(loc, dict) and 'coords' in loc:
-        pueblo = _obtener_nombre_pueblo(loc['coords']['latitude'], loc['coords']['longitude'])
-        b64 = base64.b64encode(pueblo.encode()).decode()
-        return f"LOC_{b64}"
+def obtener_ubicacion_final(coords):
+    """
+    Función principal llamada desde app.py.
+    Recibe: coords -> Tupla (lat, lon) o None.
+    Devuelve: Texto codificado (LOC_...)
+    """
+    # 1. Si la App nos pasa coordenadas GPS válidas
+    if coords and isinstance(coords, tuple):
+        lat, lon = coords
+        pueblo = _obtener_nombre_pueblo(lat, lon)
+        if pueblo:
+            return f"LOC_{_encode(pueblo)}"
+        else:
+            # Tenemos coordenadas pero no pueblo -> Devolvemos coords cifradas
+            raw = f"{lat},{lon}"
+            return f"LOC_GPS_{_encode(raw)}"
 
-    # 2. Si el GPS no responde (como en el portátil), usamos la RED
+    # 2. Si coords es None (el GPS falló o está cargando), usamos la IP como respaldo
     try:
         res = requests.get('https://ipapi.co/json/', timeout=2)
         if res.status_code == 200:
             data = res.json()
-            pueblo = data.get('city', 'Zamora')
-            b64 = base64.b64encode(pueblo.encode()).decode()
-            return f"LOC_NET_{b64}"
+            ciudad = data.get('city', 'España')
+            return f"LOC_NET_{_encode(ciudad)}"
     except:
         pass
 
-    return "LOC_BUSCANDO"
+    # 3. Si todo falla
+    return f"LOC_{_encode('Desconocido')}"
