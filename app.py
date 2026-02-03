@@ -15,9 +15,27 @@ st.set_page_config(page_title="Tasador Agrícola", page_icon="🚜", layout="cen
 # CSS Limpio
 st.markdown("""
 <style>
+    /* 1. Ocultamos la barra de herramientas y el pie de página (limpieza básica) */
     [data-testid="stToolbar"], footer {display: none;}
-    .block-container { padding-top: 3rem !important; }
+    
+    /* 2. OPTIMIZACIÓN DE ESPACIO: */
+    /* Reducimos el margen superior de 3rem a 1rem para subir el logo */
+    /* Reducimos márgenes laterales para que el formulario ocupe más ancho en móviles */
+    .block-container { 
+        padding-top: 1rem !important; 
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+    
+    /* 3. Centramos el logo */
     [data-testid="stImage"] { display: flex; justify-content: center; }
+    
+    /* 4. (Opcional) Reduce un poco el espacio entre preguntas del formulario */
+    /* Esto hace que el form sea más compacto */
+    div[data-testid="stVerticalBlock"] > div {
+        gap: 0.5rem !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
