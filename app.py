@@ -15,33 +15,30 @@ st.set_page_config(page_title="Tasador Agrícola", page_icon="🚜", layout="cen
 # CSS Limpio
 st.markdown("""
 <style>
-    /* 1. ELIMINAMOS EL ESPACIO FANTASMA */
-    /* display: none hace que la barra NO ocupe sitio */
-    header[data-testid="stHeader"] {
-        display: none !important;
-    }
-    
-    /* 2. OCULTAMOS EL RESTO */
+    /* 1. Desaparece todo lo de Streamlit */
+    header[data-testid="stHeader"] { display: none !important; }
     [data-testid="stToolbar"] { display: none !important; }
     footer { display: none !important; }
     
-    /* 3. COLOCAMOS EL LOGO EN SU SITIO EXACTO */
+    /* 2. CONTENEDOR PRINCIPAL: EL TRUCO DEL ALMENDRUCO */
     .block-container { 
-        /* margin-top: 0 anula cualquier separación por defecto */
-        margin-top: 0 !important;
+        /* Con padding-top: 0 a veces no basta. */
+        /* Forzamos un margen negativo para 'chupar' el contenido hacia arriba */
+        margin-top: -3rem !important; 
         
-        /* padding-top: 2rem es el "colchón" justo para que el logo */
-        /* no se meta debajo de la hora/batería del móvil. */
-        /* Si lo ves muy pegado, pon 3rem. Si muy separado, pon 1rem. */
-        padding-top: 1.5rem !important; 
-        
+        padding-top: 0rem !important; 
         padding-bottom: 2rem !important;
         padding-left: 1rem !important;
         padding-right: 1rem !important;
     }
     
-    /* 4. LOGO CENTRADO */
-    [data-testid="stImage"] { display: flex; justify-content: center; }
+    /* 3. LOGO */
+    [data-testid="stImage"] { 
+        display: flex; 
+        justify-content: center;
+        /* Aseguramos que la imagen no tenga margen propio */
+        margin-top: 0 !important; 
+    }
 </style>
 """, unsafe_allow_html=True)
 
