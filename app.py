@@ -94,42 +94,80 @@ if "informe_final" not in st.session_state:
         obs = st.text_area("Observaciones")
         fotos = st.file_uploader("Fotos", accept_multiple_files=True, type=['jpg','png'])
         
-        submit = st.form_submit_button("🚀 TASAR")
+       # ... (parte del formulario anterior igual) ...
+    
+    submit = st.form_submit_button("🚀 TASAR")
 
     if submit:
         if marca and modelo and fotos:
-            with st.spinner("Generando ID y Tasación..."):
-                # Aquí la IA recibe las coordenadas codificadas dentro del ID
+            with st.spinner("Analizando tractor y guardando en la nube..."):
+                # 1. Generamos el ID y texto IA
                 notas_ia = f"{obs}\n\n[ID_VERIFICACIÓN: {texto_ubicacion}]"
                 
                 try:
+                    # Llamada a la IA
                     inf = ia_engine.realizar_peritaje(
                         st.session_state.vertex_client,
                         marca, modelo, int(anio), int(horas),
                         notas_ia, fotos
                     )
                     
+                    # Guardamos datos en sesión
                     st.session_state.informe_final = inf
                     st.session_state.fotos_final = [Image.open(f) for f in fotos]
                     st.session_state.marca = marca
                     st.session_state.modelo = modelo
-                    # Generamos HTML con el ID limpio
-                    st.session_state.html = html_generator.generar_informe_html(
+                    
+                    # Generamos el HTML
+                    html_final = html_generator.generar_informe_html(
                         marca, modelo, inf, st.session_state.fotos_final, texto_ubicacion
                     )
+                    st.session_state.html = html_final
+                    
+                    # --- NUEVO: SUBIDA AUTOMÁTICA A DRIVE (TRANSPARENTE) ---
+                    try:
+                        creds = dict(st.secrets["google"])
+                        # Nombre del archivo: Tasacion_JohnDeere_6155R.html
+                        nombre_archivo = f"Tasacion_{marca}_{modelo}.html"
+                        
+                        google_drive_manager.subir_informe(creds, nombre_archivo, html_final)
+                        st.session_state.drive_status = "✅ Copia de seguridad guardada en Drive"
+                    except Exception as e:
+                        print(f"Error subiendo a Drive: {e}")
+                        st.session_state.drive_status = "⚠️ No se pudo subir a Drive (Internet inestable)"
+                    # -------------------------------------------------------
+
                     st.rerun()
+                    
                 except Exception as e:
-                    st.error(f"Error: {e}")
+                    st.error(f"Error en el proceso: {e}")
 
 # -------------------------------------------------
 # 6. RESULTADOS
 # -------------------------------------------------
 if "informe_final" in st.session_state:
+    # 1. Mostramos el aviso de que ya está en Drive
+    if "drive_status" in st.session_state:
+        st.caption(st.session_state.drive_status)
+
+    # 2. Mostramos el informe
     st.markdown(st.session_state.informe_final)
     
-    # En el HTML saldrá: ID_VERIFICACIÓN: <Tus_Coordenadas_B64>
-    st.download_button("📥 PDF/HTML", st.session_state.html, file_name="tasacion.html")
+    st.divider()
     
-    if st.button("🔄 NUEVA"):
-        st.session_state.clear()
-        st.rerun()
+    # 3. Solo DOS botones (Descargar PDF y Nueva Tasación)
+    c1, c2 = st.columns(2)
+    
+    with c1:
+        st.download_button(
+            "📥 DESCARGAR", 
+            data=st.session_state.html, 
+            file_name=f"Tasacion_{st.session_state.marca}.html",
+            mime="text/html",
+            use_container_width=True 
+        )
+            
+    with c2:
+        if st.button("🔄 NUEVA", use_container_width=True):
+            st.session_state.clear()
+            st.rerun()
