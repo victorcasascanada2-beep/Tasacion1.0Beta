@@ -1,10 +1,9 @@
-google-api-python-client
-google-genai>=0.3.0
 streamlit
-Pillow
-google-auth
-google-api-python-client
-google-auth-httplib2
-google-auth-oauthlib
 streamlit-js-eval
+google-genai
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+google-api-python-client
+Pillow
 requests
