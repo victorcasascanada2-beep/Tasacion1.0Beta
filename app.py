@@ -79,26 +79,33 @@ else:
 st.title("Tasación Experta")
 
 # -------------------------------------------------
-# 6. FORMULARIO (EL CORAZÓN DE LA APP)
+# 6. FORMULARIO (OPTIMIZADO: FOTOS PRIMERO)
 # -------------------------------------------------
 if "informe_final" not in st.session_state:
-    # AQUI ESTABA EL ERROR: Todo esto debe estar indentado dentro del 'with'
     with st.form("form_tasacion"):
+        
+        # --- ZONA DE CARGA (PRIMERO) ---
+        # Ponemos esto arriba para aprovechar el tiempo mientras el usuario escribe
+        st.caption("📸 **Sube las fotos ahora** para que se carguen mientras rellenas los datos.")
+        fotos = st.file_uploader("Imágenes del vehículo", accept_multiple_files=True, type=['jpg','png'])
+        
+        st.divider() # Separador visual para que quede ordenado
+        
+        # --- ZONA DE DATOS ---
         c1, c2 = st.columns(2)
         with c1:
-            marca = st.text_input("Marca", value="John Deere")
+            marca = st.text_input("Marca", placeholder="Ej: John Deere")
             modelo = st.text_input("Modelo", placeholder="Ej: 6155R")
         with c2:
-            anio = st.text_input("Año", placeholder="Ej 2018")
-            horas = st.text_input("Horas", placeholder="Ej 5000")
+            anio = st.text_input("Año", placeholder="Ej: 2018")
+            horas = st.text_input("Horas", placeholder="Ej: 5000")
         
-        obs = st.text_area("Observaciones / Extras", placeholder="Ej Con tripuntal delantero ruedas al 80% sin aire acondicionado")
-        fotos = st.file_uploader("Fotos del tractor", accept_multiple_files=True, type=['jpg','png'])
+        obs = st.text_area("Observaciones / Extras", placeholder="Ej: Ruedas al 80%, suspensión delantera, tripuntal...")
         
-        # EL BOTÓN DEBE ESTAR DENTRO DEL FORM (Indentado)
+        # BOTÓN DE ENVÍO
         submit = st.form_submit_button("🚀 TASAR AHORA", use_container_width=True)
 
-    # Lógica de procesado (fuera del form, pero reacciona al botón)
+    # Lógica de procesado
     if submit:
         if marca and modelo and fotos:
             with st.spinner("Analizando y guardando en la nube..."):
@@ -140,20 +147,18 @@ if "informe_final" not in st.session_state:
                 except Exception as e:
                     st.error(f"Error en el proceso: {e}")
         else:
-            st.warning("Por favor, rellena Marca, Modelo y sube al menos una foto.")
+            st.warning("⚠️ Faltan datos: Asegúrate de poner Marca, Modelo y Fotos.")
 
 # -------------------------------------------------
-# 7. RESULTADOS (LIMPIOS)
+# 7. RESULTADOS
 # -------------------------------------------------
 if "informe_final" in st.session_state:
-    # Aviso discreto de Drive
     if "drive_status" in st.session_state:
         st.caption(st.session_state.drive_status)
 
     st.markdown(st.session_state.informe_final)
     st.divider()
     
-    # Solo 2 botones: Descargar y Nueva (Drive ya se hizo solo)
     c1, c2 = st.columns(2)
     
     with c1:
