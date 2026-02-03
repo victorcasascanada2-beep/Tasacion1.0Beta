@@ -22,7 +22,7 @@ st.markdown("""
     /* Reducimos el margen superior de 3rem a 1rem para subir el logo */
     /* Reducimos márgenes laterales para que el formulario ocupe más ancho en móviles */
     .block-container { 
-        padding-top: 0.5rem !important; 
+        padding-top: 0rem !important; 
         padding-left: 1rem !important;
         padding-right: 1rem !important;
         padding-bottom: 1rem !important;
