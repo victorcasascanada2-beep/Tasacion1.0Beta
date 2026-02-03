@@ -94,7 +94,7 @@ if "informe_final" not in st.session_state:
         # --- ZONA DE DATOS ---
         c1, c2 = st.columns(2)
         with c1:
-            marca = st.text_input("Marca", placeholder="Ej: John Deere")
+            marca = st.text_input("Marca", value="John Deere")
             modelo = st.text_input("Modelo", placeholder="Ej: 6155R")
         with c2:
             anio = st.text_input("Año", placeholder="Ej: 2018")
