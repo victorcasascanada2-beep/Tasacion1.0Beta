@@ -72,7 +72,7 @@ if os.path.exists("afoto.png"):
     st.image("afoto.png", width=300)
 else:
     try:
-        st.image("https://raw.githubusercontent.com/victorcasascanada2-beep/Tasacion1.0Beta/main/afoto.png", width=300)
+        st.image("agricolanoroestelogo.jpg", width=300)
     except:
         st.warning("⚠️ Logo no cargado, sistema operativo.")
 
