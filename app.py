@@ -86,13 +86,13 @@ if "informe_final" not in st.session_state:
     with st.form("form_tasacion"):
         c1, c2 = st.columns(2)
         with c1:
-            marca = st.text_input("Marca", placeholder="Ej: John Deere")
+            marca = st.text_input("Marca", value="John Deere")
             modelo = st.text_input("Modelo", placeholder="Ej: 6155R")
         with c2:
-            anio = st.text_input("Año", value="2018")
-            horas = st.text_input("Horas", value="5000")
+            anio = st.text_input("Año", placeholder="Ej 2018")
+            horas = st.text_input("Horas", placeholder="Ej 5000")
         
-        obs = st.text_area("Observaciones / Extras")
+        obs = st.text_area("Observaciones / Extras", placeholder="Con tripuntal delantero ruedas al 80% sin aire acondicionado")
         fotos = st.file_uploader("Fotos del tractor", accept_multiple_files=True, type=['jpg','png'])
         
         # EL BOTÓN DEBE ESTAR DENTRO DEL FORM (Indentado)
