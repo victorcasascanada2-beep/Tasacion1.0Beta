@@ -55,10 +55,7 @@ if "vertex_client" not in st.session_state:
 # -------------------------------------------------
 # 4. INTERFAZ
 # -------------------------------------------------
-# Corrección: Solo una vez el nombre de la variable y la URL limpia
-logo_url = "https://raw.githubusercontent.com/victorcasascanada2-beep/Tasacion1.0Beta/main/afoto.png"
-
-st.image(logo_url, width=300)
+st.image("afoto.png", width=300)
 st.title("Tasación Experta")
 st.caption("Sistema de valoración profesional")
 
