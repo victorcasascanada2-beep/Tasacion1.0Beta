@@ -15,27 +15,30 @@ st.set_page_config(page_title="Tasador Agrícola", page_icon="🚜", layout="cen
 # CSS Limpio
 st.markdown("""
 <style>
-    /* 1. Ocultamos la barra de herramientas y el pie de página (limpieza básica) */
-    [data-testid="stToolbar"], footer {display: none;}
+    /* 1. Ocultamos la barra superior de Streamlit (el hueco blanco) */
+    header[data-testid="stHeader"] {
+        background-color: transparent !important;
+        visibility: hidden !important; /* La hacemos invisible */
+    }
     
-    /* 2. OPTIMIZACIÓN DE ESPACIO: */
-    /* Reducimos el margen superior de 3rem a 1rem para subir el logo */
-    /* Reducimos márgenes laterales para que el formulario ocupe más ancho en móviles */
+    /* 2. Ocultamos el menú hamburguesa y botones */
+    [data-testid="stToolbar"] {
+        display: none !important;
+    }
+    
+    /* 3. Ocultamos el pie de página */
+    footer { display: none !important; }
+    
+    /* 4. EL AJUSTE CRÍTICO: Subimos todo el contenido */
     .block-container { 
-        padding-top: 0rem !important; 
+        padding-top: 1rem !important; /* Solo 1rem de margen arriba */
+        padding-bottom: 2rem !important;
         padding-left: 1rem !important;
         padding-right: 1rem !important;
-        padding-bottom: 1rem !important;
     }
     
-    /* 3. Centramos el logo */
+    /* 5. Centramos logo */
     [data-testid="stImage"] { display: flex; justify-content: center; }
-    
-    /* 4. (Opcional) Reduce un poco el espacio entre preguntas del formulario */
-    /* Esto hace que el form sea más compacto */
-    div[data-testid="stVerticalBlock"] > div {
-        gap: 0.5rem !important;
-    }
 </style>
 """, unsafe_allow_html=True)
 
