@@ -2,18 +2,16 @@ import base64
 
 def codificar_coordenadas(lat, lon):
     """
-    Recibe latitud y longitud puras (números).
-    Devuelve el código cifrado para el informe (LOC_GPS_...).
-    NO conecta a internet. NO busca pueblos. SOLO formatea.
+    Recibe: 41.503, -5.75
+    Devuelve: NDEuNTAzLC01Ljc1 (Base64 puro)
     """
     if lat is None or lon is None:
-        return "LOC_PENDIENTE"
+        return "PENDIENTE"
         
-    # Creamos el string simple: "41.503,-5.75"
+    # 1. Creamos el string de coordenadas puras
     datos_raw = f"{lat},{lon}"
     
-    # Lo codificamos en Base64 para el informe
-    # Resultado ejemplo: "LOC_GPS_NDEuNTIsLTUuNzU="
+    # 2. Lo convertimos a Base64 sin ningún texto extra
     b64 = base64.b64encode(datos_raw.encode()).decode()
     
-    return f"LOC_GPS_{b64}"
+    return b64
