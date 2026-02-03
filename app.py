@@ -92,7 +92,7 @@ if "informe_final" not in st.session_state:
             anio = st.text_input("Año", placeholder="Ej 2018")
             horas = st.text_input("Horas", placeholder="Ej 5000")
         
-        obs = st.text_area("Observaciones / Extras", placeholder="Con tripuntal delantero ruedas al 80% sin aire acondicionado")
+        obs = st.text_area("Observaciones / Extras", placeholder="Ejelmplo Con tripuntal delantero ruedas al 80% sin aire acondicionado")
         fotos = st.file_uploader("Fotos del tractor", accept_multiple_files=True, type=['jpg','png'])
         
         # EL BOTÓN DEBE ESTAR DENTRO DEL FORM (Indentado)
