@@ -19,7 +19,7 @@ st.markdown("""
     .block-container { 
         margin-top: -3rem !important;
         padding-top: 1rem !important;
-        padding-bottom: 2rem !important;
+        padding-bottom: 3rem !important;
     }
     [data-testid="stImage"] { display: flex; justify-content: center; }
     button[kind="secondaryFormSubmit"] {
