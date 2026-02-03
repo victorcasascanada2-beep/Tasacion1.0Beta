@@ -68,8 +68,8 @@ if "vertex_client" not in st.session_state:
 # -------------------------------------------------
 # 5. INTERFAZ (LOGO BLINDADO)
 # -------------------------------------------------
-if os.path.exists("afoto.png"):
-    st.image("afoto.png", width=300)
+if os.path.exists("gricolanoroestelogo.jpg"):
+    st.image("gricolanoroestelogo.jpg", width=300)
 else:
     try:
         st.image("agricolanoroestelogo.jpg", width=300)
