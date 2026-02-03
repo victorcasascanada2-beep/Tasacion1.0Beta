@@ -1,6 +1,7 @@
 # config_prompt.py
 
 def obtener_prompt_tasacion(marca, modelo, anio, horas, observaciones):
+    obtenerFicheroDePrecios(Lectura):
     return f"""
     Eres el Responsable de Usados de Agrícola Noroeste. 
     Tu misión es tasar este tractor combinando DATOS TÉCNICOS y ANÁLISIS VISUAL.
