@@ -15,29 +15,32 @@ st.set_page_config(page_title="Tasador Agrícola", page_icon="🚜", layout="cen
 # CSS Limpio
 st.markdown("""
 <style>
-    /* 1. Ocultamos la barra superior de Streamlit (el hueco blanco) */
+    /* 1. ELIMINAMOS EL ESPACIO FANTASMA */
+    /* display: none hace que la barra NO ocupe sitio */
     header[data-testid="stHeader"] {
-        background-color: transparent !important;
-        visibility: hidden !important; /* La hacemos invisible */
-    }
-    
-    /* 2. Ocultamos el menú hamburguesa y botones */
-    [data-testid="stToolbar"] {
         display: none !important;
     }
     
-    /* 3. Ocultamos el pie de página */
+    /* 2. OCULTAMOS EL RESTO */
+    [data-testid="stToolbar"] { display: none !important; }
     footer { display: none !important; }
     
-    /* 4. EL AJUSTE CRÍTICO: Subimos todo el contenido */
+    /* 3. COLOCAMOS EL LOGO EN SU SITIO EXACTO */
     .block-container { 
-        padding-top: 1rem !important; /* Solo 1rem de margen arriba */
+        /* margin-top: 0 anula cualquier separación por defecto */
+        margin-top: 0 !important;
+        
+        /* padding-top: 2rem es el "colchón" justo para que el logo */
+        /* no se meta debajo de la hora/batería del móvil. */
+        /* Si lo ves muy pegado, pon 3rem. Si muy separado, pon 1rem. */
+        padding-top: 1.5rem !important; 
+        
         padding-bottom: 2rem !important;
         padding-left: 1rem !important;
         padding-right: 1rem !important;
     }
     
-    /* 5. Centramos logo */
+    /* 4. LOGO CENTRADO */
     [data-testid="stImage"] { display: flex; justify-content: center; }
 </style>
 """, unsafe_allow_html=True)
