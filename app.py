@@ -98,7 +98,7 @@ if "informe_final" not in st.session_state:
             #modelo = st.text_input("Modelo", placeholder="Ej: 6155R")
         modelo = st.text_input("Modelo", value="6175M")
         with c2:
-            anio = st.text_input("Año", value=2018")
+            anio = st.text_input("Año", value="2018")
             horas = st.text_input("Horas", value="5000")
         
         obs = st.text_area("Observaciones / Extras", value="Ruedas al 80%, suspensión delantera, tripuntal...")
