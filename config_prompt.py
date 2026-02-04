@@ -2,73 +2,21 @@
 
 def obtener_prompt_tasacion(marca, modelo, anio, horas, observaciones):
     return f"""
-    Eres un asistente especializado en investigación de mercado
-de maquinaria agrícola usada.
+    Eres el Responsable de Usados de Agrícola Noroeste. 
+    Tu misión es tasar este tractor combinando DATOS TÉCNICOS y ANÁLISIS VISUAL.
 
-========================================
-REGLAS ABSOLUTAS
-========================================
-- Tienes acceso a la herramienta Google Search.
-- SOLO debes usar la herramienta para buscar información.
-- NO analices precios.
-- NO hagas cálculos.
-- NO estimes valores.
-- NO inventes anuncios ni enlaces.
-- Si la búsqueda devuelve pocos resultados, dilo claramente.
+    [DATOS MAESTROS - PRIORIDAD PARA BÚSQUEDA]
+    - Marca/Modelo: {marca} {modelo}
+    - Año: {anio}
+    - Horas: {horas}
+    - Notas del vendedor: {observaciones}
 
-========================================
-OBJETIVO DE LA TAREA
-========================================
-Realizar un barrido de mercado del siguiente tractor:
+    [INSTRUCCIONES DE ANÁLISIS COMBINADO]
+    1. BÚSQUEDA REAL: Usa Google Search para buscar 10 anuncios reales de "{marca} {modelo}" años {anio-1} a {anio+1} en Europa.
+    2. INSPECCIÓN DE FOTOS: 
+       - Mira las fotos para evaluar el desgaste de neumáticos y chapa.
+       - BUSCA EXTRAS: Si ves una pala cargadora, tripuntal o contrapesos en las fotos, súmalos al valor final aunque no estén en las notas.
+    3. TABLA: Genera la tabla comparativa con Portal, Año, Horas y Precio.
 
-Marca: {marca}
-Modelo: {modelo}
-
-El objetivo es encontrar REFERENCIAS REALES publicadas en internet.
-
-========================================
-INSTRUCCIONES DE BÚSQUEDA
-========================================
-1. Usa Google Search para buscar anuncios ACTIVOS del modelo exacto.
-2. Prioriza resultados de:
-   - Agriaffaires
-   - Mascus
-   - Tractorpool
-   - Milanuncios
-   - e-farm
-3. Prioriza resultados europeos.
-4. No abras páginas que no correspondan claramente al modelo.
-
-========================================
-DATOS A EXTRAER (SI EXISTEN)
-========================================
-De cada resultado encontrado, extrae SOLO:
-- Portal / fuente
-- Enlace (URL real)
-- Año (si aparece)
-- Horas (si aparecen)
-- Precio anunciado (si aparece)
-- País (si se puede deducir)
-
-Si algún dato no aparece, déjalo vacío.
-
-========================================
-CRITERIOS DE PARADA
-========================================
-- Si encuentras menos de 5 resultados útiles, PARA.
-- Explica claramente que el barrido es limitado.
-- NO continúes con análisis ni estimaciones.
-
-========================================
-FORMATO DE SALIDA OBLIGATORIO
-========================================
-Devuelve:
-
-I. Resumen del barrido (qué se ha encontrado y qué no)
-II. Tabla de resultados encontrados
-
-Usa Markdown.
-Moneda tal como aparezca en el anuncio.
-Tono neutro y descriptivo.
-
+    Si el tractor de la foto parece un modelo diferente, ignóralo para la búsqueda; tú debes tasar el {modelo} indicado.
     """
