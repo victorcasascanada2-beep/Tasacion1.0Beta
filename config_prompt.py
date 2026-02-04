@@ -1,7 +1,7 @@
 # config_prompt.py
 
 def obtener_prompt_tasacion(marca, modelo, anio, horas, observaciones):
-    return f""""""
+    return f"""
             Actúa como experto tasador de Agrícola Noroeste. Busca y cerciorate de que los datos son reales
             Analiza este {marca} {modelo} del año {anio} con {horas} horas.
             
