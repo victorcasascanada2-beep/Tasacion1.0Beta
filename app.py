@@ -7,21 +7,34 @@ import google_drive_manager
 import location_manager
 import os
 
+# -------------------------------------------------
 # 1. CONFIGURACIÓN
+# -------------------------------------------------
 st.set_page_config(page_title="Tasador Agrícola", page_icon="🚜", layout="centered")
 
-# 2. CSS "MODO APP NATIVA"
+# -------------------------------------------------
+# 2. CSS "MODO APP NATIVA" (Sin barras ni huecos)
+# -------------------------------------------------
 st.markdown("""
 <style>
+    /* 1. Desaparece todo lo de Streamlit */
     header[data-testid="stHeader"] { display: none !important; }
     [data-testid="stToolbar"] { display: none !important; }
     footer { display: none !important; }
+    
+    /* 2. CONTENEDOR PRINCIPAL: PEGADO AL TECHO */
     .block-container { 
-        margin-top: -3rem !important;
-        padding-top: 1rem !important;
-        padding-bottom: 3rem !important;
+        margin-top: -3rem !important; /* Absorbe el hueco fantasma */
+        padding-top: 1rem !important; /* Espacio de seguridad mínimo */
+        padding-bottom: 2rem !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
     }
+    
+    /* 3. LOGO Y BOTONES */
     [data-testid="stImage"] { display: flex; justify-content: center; }
+    
+    /* Botón de Tasar más visible */
     button[kind="secondaryFormSubmit"] {
         border: 2px solid #2e7d32 !important;
         color: #2e7d32 !important;
@@ -30,13 +43,21 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 3. UBICACIÓN
+# -------------------------------------------------
+# 3. UBICACIÓN (ARQUITECTURA "DONDEESTOY")
+# -------------------------------------------------
 loc = get_geolocation(component_key="gps_tasacion_final")
 texto_ubicacion = "PENDIENTE"
-if loc and isinstance(loc, dict) and 'coords' in loc:
-    texto_ubicacion = location_manager.codificar_coordenadas(loc['coords']['latitude'], loc['coords']['longitude'])
 
+if loc and isinstance(loc, dict) and 'coords' in loc:
+    lat = loc['coords']['latitude']
+    lon = loc['coords']['longitude']
+    # Formateo simple a Base64
+    texto_ubicacion = location_manager.codificar_coordenadas(lat, lon)
+
+# -------------------------------------------------
 # 4. CONEXIÓN GOOGLE
+# -------------------------------------------------
 if "vertex_client" not in st.session_state:
     try:
         creds = dict(st.secrets["google"])
@@ -44,106 +65,112 @@ if "vertex_client" not in st.session_state:
     except Exception as e:
         st.error(f"Error credenciales: {e}")
 
-# 5. LOGO
-# ... (Partes anteriores de importación y CSS se mantienen igual)
-
-# 5. LOGO (Actualizado a agricolanoroestelogo.jpg)
-try:
+# -------------------------------------------------
+# 5. INTERFAZ (LOGO BLINDADO)
+# -------------------------------------------------
+if os.path.exists("agricolanoroestelogo.jpg"):
     st.image("agricolanoroestelogo.jpg", width=300)
-except:
-    st.warning("⚠️ Logo no encontrado.")
+else:
+    try:
+        st.image("agricolanoroestelogo.jpg", width=300)
+    except:
+        st.warning("⚠️ Logo no cargado, sistema operativo.")
 
-st.title("Tasación Experta K-Factor")
+st.title("Tasación Experta")
 
-# --- INICIALIZACIÓN DE ESTADO PARA PERSISTENCIA ---
-if "marca" not in st.session_state: st.session_state.marca = "John Deere"
-if "modelo" not in st.session_state: st.session_state.modelo = ""
-if "anio" not in st.session_state: st.session_state.anio = ""
-if "horas" not in st.session_state: st.session_state.horas = ""
-if "obs" not in st.session_state: st.session_state.obs = ""
-if "fotos_cargadas" not in st.session_state: st.session_state.fotos_cargadas = []
-
-# 6. FORMULARIO (Se muestra si NO hay informe generado)
+# -------------------------------------------------
+# 6. FORMULARIO (OPTIMIZADO: FOTOS PRIMERO)
+# -------------------------------------------------
 if "informe_final" not in st.session_state:
     with st.form("form_tasacion"):
-        st.caption("📸 **Fotos del tractor**")
-        fotos = st.file_uploader("Imágenes", accept_multiple_files=True, type=['jpg','png'], key="uploader")
         
-        # Lógica de persistencia de fotos
-        fotos_a_procesar = fotos if fotos else st.session_state.fotos_cargadas
-        if not fotos and st.session_state.fotos_cargadas:
-            st.info(f"✅ Manteniendo {len(st.session_state.fotos_cargadas)} fotos anteriores.")
-
-        st.divider()
+        # --- ZONA DE CARGA (PRIMERO) ---
+        # Ponemos esto arriba para aprovechar el tiempo mientras el usuario escribe
+        st.caption("📸 **Sube las fotos ahora** para que se carguen mientras rellenas los datos.")
+        fotos = st.file_uploader("Imágenes del vehículo", accept_multiple_files=True, type=['jpg','png'])
         
+        st.divider() # Separador visual para que quede ordenado
+        
+        # --- ZONA DE DATOS ---
         c1, c2 = st.columns(2)
         with c1:
-            marca = st.text_input("Marca", value=st.session_state.marca)
-            modelo = st.text_input("Modelo", value=st.session_state.modelo)
+            marca = st.text_input("Marca", value="John Deere")
+            modelo = st.text_input("Modelo", placeholder="Ej: 6155R")
         with c2:
-            anio = st.text_input("Año", value=st.session_state.anio)
-            horas = st.text_input("Horas", value=st.session_state.horas)
+            anio = st.text_input("Año", placeholder="Ej: 2018")
+            horas = st.text_input("Horas", placeholder="Ej: 5000")
         
-        obs = st.text_area("Observaciones (Estado, Neumáticos, Garantía...)", value=st.session_state.obs)
+        obs = st.text_area("Observaciones / Extras", placeholder="Ej: Ruedas al 80%, suspensión delantera, tripuntal...")
         
-        submit = st.form_submit_button("🚀 CALCULAR TASACIÓN K-FACTOR", use_container_width=True)
+        # BOTÓN DE ENVÍO
+        submit = st.form_submit_button("🚀 TASAR AHORA", use_container_width=True)
 
+    # Lógica de procesado
     if submit:
-        if marca and modelo and fotos_a_procesar:
-            # Guardamos todo en el estado antes de procesar
-            st.session_state.update({
-                "marca": marca, "modelo": modelo, "anio": anio, 
-                "horas": horas, "obs": obs, "fotos_cargadas": fotos_a_procesar
-            })
-
-            with st.spinner("Buscando modelo y aplicando algoritmo 10/8/9..."):
+        if marca and modelo and fotos:
+            with st.spinner("Analizando y guardando en la nube..."):
+                # 1. Generamos el ID y texto IA
+                notas_ia = f"{obs}\n\n[ID_VERIFICACIÓN: {texto_ubicacion}]"
+                
                 try:
-                    # Llamada a la IA (ella buscará los CV y aplicará el K-Factor)
+                    # Llamada a la IA
                     inf = ia_engine.realizar_peritaje(
                         st.session_state.vertex_client,
-                        marca, modelo, anio, horas, obs, fotos_a_procesar
+                        marca, modelo, int(anio), int(horas),
+                        notas_ia, fotos
                     )
                     
+                    # Guardamos sesión
                     st.session_state.informe_final = inf
-                    st.session_state.fotos_pil = [Image.open(f) for f in fotos_a_procesar]
+                    st.session_state.fotos_final = [Image.open(f) for f in fotos]
+                    st.session_state.marca = marca
+                    st.session_state.modelo = modelo
                     
-                    # Generar HTML para descarga y Drive
+                    # Generamos HTML
                     html_final = html_generator.generar_informe_html(
-                        marca, modelo, inf, st.session_state.fotos_pil, texto_ubicacion
+                        marca, modelo, inf, st.session_state.fotos_final, texto_ubicacion
                     )
                     st.session_state.html = html_final
                     
-                    # Backup en Drive
+                    # --- SUBIDA AUTOMÁTICA A DRIVE (Invisible) ---
                     try:
                         creds = dict(st.secrets["google"])
-                        google_drive_manager.subir_informe(creds, f"Tasacion_{marca}_{modelo}.html", html_final)
-                    except: pass
-                    
-                    st.rerun()
-                except Exception as e:
-                    st.error(f"Error: {e}")
-        else:
-            st.warning("⚠️ Faltan datos obligatorios o fotos.")
+                        nombre_archivo = f"Tasacion_{marca}_{modelo}.html"
+                        google_drive_manager.subir_informe(creds, nombre_archivo, html_final)
+                        st.session_state.drive_status = "✅ Copia de seguridad guardada en Drive"
+                    except Exception as e:
+                        st.session_state.drive_status = "⚠️ No se pudo subir a Drive (Internet inestable)"
+                    # ---------------------------------------------
 
-# 7. PANTALLA DE RESULTADOS
-else:
+                    st.rerun()
+                    
+                except Exception as e:
+                    st.error(f"Error en el proceso: {e}")
+        else:
+            st.warning("⚠️ Faltan datos: Asegúrate de poner Marca, Modelo y Fotos.")
+
+# -------------------------------------------------
+# 7. RESULTADOS
+# -------------------------------------------------
+if "informe_final" in st.session_state:
+    if "drive_status" in st.session_state:
+        st.caption(st.session_state.drive_status)
+
     st.markdown(st.session_state.informe_final)
     st.divider()
     
-    col_btn1, col_btn2 = st.columns(2)
+    c1, c2 = st.columns(2)
     
-    with col_btn1:
-        st.download_button("📥 DESCARGAR INFORME", data=st.session_state.html, 
-                           file_name=f"Tasacion_{st.session_state.marca}.html", mime="text/html", use_container_width=True)
-    
-    with col_btn2:
-        # AQUÍ ESTÁ EL BOTÓN RECUPERADO
-        if st.button("🔄 AJUSTAR Y RE-TASAR", use_container_width=True):
-            # Borramos el informe para que el flujo vuelva al formulario, 
-            # pero los datos (marca, modelo, fotos...) siguen en st.session_state
-            del st.session_state.informe_final
+    with c1:
+        st.download_button(
+            "📥 DESCARGAR", 
+            data=st.session_state.html, 
+            file_name=f"Tasacion_{st.session_state.marca}.html",
+            mime="text/html",
+            use_container_width=True
+        )
+            
+    with c2:
+        if st.button("🔄 NUEVA", use_container_width=True):
+            st.session_state.clear()
             st.rerun()
-    
-    if st.button("🆕 NUEVA TASACIÓN (LIMPIAR TODO)", use_container_width=False):
-        st.session_state.clear()
-        st.rerun()
